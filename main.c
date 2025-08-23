@@ -14,9 +14,12 @@ n_roots solve_square(double a, double b, double c,
 void print_roots(n_roots count_roots,
                  double x1, double x2);
 bool is_near_the_zero(double a);
+int test_solve_equation();
 
 int main()
 {
+    if (test_solve_equation() == 0)
+        printf("Тестирование функции solve_equation прошло успешно\n");
     double a = 0, b = 0, c = 0;
     printf("Введите коэффициенты уравнения ax^2 + bx + c = 0\n"
            "a, b, c: ");
@@ -107,4 +110,49 @@ void print_roots(n_roots count_roots,
 bool is_near_the_zero(double a)
 {
     return fabs(a) <= EPSILON;
+}
+
+int test_solve_equation()
+{
+    int count_failed_tests = 0;
+    struct test {
+        double a, b, c;
+        n_roots count_roots;
+        double x1, x2;
+    } tests[] =
+    {
+        0, 0, 0, INF_ROOT, 0, 0,
+        0, 0, 1, NO_ROOTS, 0, 0,
+        0, 1, 0, ONE_ROOT, 0, 0,
+        1, 4, 4, ONE_ROOT, -2, -2,
+        1, 3, 2, TWO_ROOTS, -1, -2,
+        1, 2, 1, ONE_ROOT, -1, -1,
+        1, 2, 0, TWO_ROOTS, 0, -2,
+        1, 1, 0, TWO_ROOTS, 0, -1,
+        1, 0, 0, ONE_ROOT, 0, 0,
+        1, 1, -2, TWO_ROOTS, 1, -2,
+        1, 0, -1, TWO_ROOTS, 1, -1,
+        1, -1, 0, TWO_ROOTS, 1, 0,
+        1, -2, 1, ONE_ROOT, 1, 1,
+        1, 0, -4, TWO_ROOTS, 2, -2,
+        1, -1, -2, TWO_ROOTS, 2, -1,
+        1, -2, 0, TWO_ROOTS, 2, 0,
+        1, -3, 2, TWO_ROOTS, 2, 1,
+        1, -4, 4, ONE_ROOT, 2, 2,
+    };
+    int count_tests = sizeof(tests) / sizeof(tests[0]);
+    for (int i = 0; i < count_tests; i++)
+    {
+        double x1 = 0, x2 = 0;
+        n_roots count_roots = solve_equation(tests[i].a, tests[i].b, tests[i].c, &x1, &x2);
+        if (!(count_roots == tests[i].count_roots &&
+            is_near_the_zero(x1 - tests[i].x1) &&
+            is_near_the_zero(x2 - tests[i].x2)))
+        {
+            printf("FAILED: a = %lg, b = %lg, c = %lg, count_roots = %d, x1 = %lg, x2 = %lg\n",
+                    tests[i].a, tests[i].b, tests[i].c, count_roots, x1, x2);
+            count_failed_tests++;
+        }
+    }
+    return count_failed_tests;
 }
