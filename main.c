@@ -13,6 +13,7 @@ n_roots solve_square(double a, double b, double c,
                      double* x1, double* x2);
 void print_roots(n_roots count_roots,
                  double x1, double x2);
+bool is_near_the_zero(double a);
 
 int main()
 {
@@ -31,7 +32,7 @@ int main()
 n_roots solve_equation(double a, double b, double c,
                        double* x1, double* x2)
 {
-    if (fabs(a) <= EPSILON)
+    if (is_near_the_zero(a))
     {
         return solve_linear(b, c, x1);
     }
@@ -51,7 +52,7 @@ n_roots solve_square(double a, double b, double c,
         *x2 = (-b - sqrt(discriminant)) / (2 * a);
         return TWO_ROOTS;
     }
-    else if (fabs(discriminant) <= EPSILON)
+    else if (is_near_the_zero(discriminant))
     {
         *x1 = *x2 = -b / (2 * a);
         return ONE_ROOT;
@@ -65,9 +66,9 @@ n_roots solve_square(double a, double b, double c,
 n_roots solve_linear(double b, double c,
                      double* x)
 {
-    if (fabs(b) <= EPSILON)
+    if (is_near_the_zero(b))
     {
-        if (fabs(c) <= EPSILON)
+        if (is_near_the_zero(c))
             return INF_ROOT;
         else
             return NO_ROOTS;
@@ -101,4 +102,9 @@ void print_roots(n_roots count_roots,
             printf("count_roots = %d", count_roots);
             break;
     }
+}
+
+bool is_near_the_zero(double a)
+{
+    return fabs(a) <= EPSILON;
 }
