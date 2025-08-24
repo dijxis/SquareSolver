@@ -5,6 +5,12 @@
 enum n_roots {INF_ROOT, NO_ROOTS, ONE_ROOT, TWO_ROOTS};
 const double EPSILON = 1e-9;
 
+struct test {
+        double a, b, c;
+        n_roots count_roots;
+        double x1, x2;
+};
+
 n_roots solve_equation(double a, double b, double c,
                        double* x1, double* x2);
 n_roots solve_linear(double b, double c,
@@ -15,6 +21,7 @@ void print_roots(n_roots count_roots,
                  double x1, double x2);
 bool is_near_the_zero(double a);
 int test_solve_equation();
+int one_test(test current_test);
 
 int main()
 {
@@ -115,11 +122,7 @@ bool is_near_the_zero(double a)
 int test_solve_equation()
 {
     int count_failed_tests = 0;
-    struct test {
-        double a, b, c;
-        n_roots count_roots;
-        double x1, x2;
-    } tests[] =
+    test tests[] =
     {
         0, 0, 0, INF_ROOT, 0, 0,
         0, 0, 1, NO_ROOTS, 0, 0,
@@ -143,16 +146,24 @@ int test_solve_equation()
     int count_tests = sizeof(tests) / sizeof(tests[0]);
     for (int i = 0; i < count_tests; i++)
     {
-        double x1 = 0, x2 = 0;
-        n_roots count_roots = solve_equation(tests[i].a, tests[i].b, tests[i].c, &x1, &x2);
-        if (!(count_roots == tests[i].count_roots &&
-            is_near_the_zero(x1 - tests[i].x1) &&
-            is_near_the_zero(x2 - tests[i].x2)))
-        {
-            printf("FAILED: a = %lg, b = %lg, c = %lg, count_roots = %d, x1 = %lg, x2 = %lg\n",
-                    tests[i].a, tests[i].b, tests[i].c, count_roots, x1, x2);
-            count_failed_tests++;
-        }
+        count_failed_tests += one_test(tests[i]);
     }
     return count_failed_tests;
+}
+
+int one_test(test current_test)
+{
+    double x1 = 0, x2 = 0;
+    n_roots count_roots = solve_equation(current_test.a, current_test.b, current_test.c, &x1, &x2);
+    if (!(count_roots == current_test.count_roots &&
+            is_near_the_zero(x1 - current_test.x1) &&
+            is_near_the_zero(x2 - current_test.x2)))
+    {
+        printf("FAILED: a = %lg, b = %lg, c = %lg, count_roots = %d, x1 = %lg, x2 = %lg "
+               "(should be count_roots = %d, x1 = %lg, x2 = %lg)\n",
+                current_test.a, current_test.b, current_test.c, count_roots, x1, x2,
+                current_test.count_roots, current_test.x1, current_test.x2);
+        return 1;
+    }
+    return 0;
 }
