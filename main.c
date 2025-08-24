@@ -4,6 +4,7 @@
 
 enum N_roots
 {
+    NAN_ROOTS = -2,
     INF_ROOT = -1,
     NO_ROOTS = 0,
     ONE_ROOT = 1,
@@ -136,30 +137,29 @@ bool equal(double a, double b)
 int test_solve_equation()
 {
     int count_failed_tests = 0;
-    Test tests[] =
-    {
-        {0, 0, 0, INF_ROOT, NAN, NAN}, // TODO: из файла
-        {0, 0, 1, NO_ROOTS, NAN, NAN},
-        {0, 1, 0, ONE_ROOT, 0, 0},
-        {1, 4, 4, ONE_ROOT, -2, -2},
-        {1, 3, 2, TWO_ROOTS, -1, -2},
-        {1, 3, 2, TWO_ROOTS, -2, -1}
-    };
-    int count_tests = sizeof(tests) / sizeof(tests[0]);
+    FILE *file = fopen("tests.txt", "r");
+    int count_tests = 0;
+    fscanf(file, "%d", &count_tests);
     for (int i = 0; i < count_tests; i++)
     {
-        count_failed_tests += one_test(tests[i]);
+        double a = NAN, b = NAN, c = NAN;
+        N_roots count_roots = NAN_ROOTS;
+        double x1 = NAN, x2 = NAN;
+        fscanf(file, "%lg %lg %lg %d %lg %lg", &a, &b, &c, &count_roots, &x1, &x2);
+        Test test = {a, b, c, count_roots, x1, x2};
+        count_failed_tests += one_test(test);
     }
+    fclose(file);
     return count_failed_tests;
 }
 
 int one_test(Test current_test)
 {
-    double x1 = NAN, x2 = NAN; // TODO: NAN
+    double x1 = NAN, x2 = NAN;
     N_roots count_roots = solve_equation(current_test.a, current_test.b, current_test.c, &x1, &x2);
     sort_roots(&x1, &x2);
     sort_roots(&current_test.x1, &current_test.x2);
-    if (!is_correct_roots(current_test, count_roots, x1, x2)) // TODO: корни в другом порядке
+    if (!is_correct_roots(current_test, count_roots, x1, x2))
     {
         printf("FAILED: a = %lg, b = %lg, c = %lg, count_roots = %d, x1 = %lg, x2 = %lg "
                "(should be count_roots = %d, x1 = %lg, x2 = %lg)\n",
