@@ -1,41 +1,27 @@
-#include <stdio.h>
+#define TX_COMPILED
 #include <TXlib.h>
+#include <stdio.h>
 #include <math.h>
+#include "solver.h"
 
-enum N_roots
-{
-    NAN_ROOTS = -2,
-    INF_ROOT = -1,
-    NO_ROOTS = 0,
-    ONE_ROOT = 1,
-    TWO_ROOTS = 2
-};
-const double EPSILON = 1e-9;
 
-struct Test
+struct Test_data_equation
 {
-        double a, b, c;
-        N_roots count_roots;
-        double x1, x2;
+    double a, b, c;
+    N_roots count_roots;
+    double x1, x2;
 };
 
-N_roots solve_equation(double a, double b, double c,
-                       double* x1, double* x2);
-N_roots solve_linear(double b, double c,
-                     double* x);
-N_roots solve_square(double a, double b, double c,
-                     double* x1, double* x2);
-void print_roots(N_roots count_roots,
+void printRoots(N_roots count_roots,
                  double x1, double x2);
-bool equal(double a, double b);
-int test_solve_equation();
-int one_test(Test current_test);
-void sort_roots(double* x1, double* x2);
-bool is_correct_roots(Test test, N_roots count_roots, double x1, double x2);
+int testSolveEquation();
+bool oneTestSolveEquation(Test_data_equation current_test);
+void sortRoots(double* x1, double* x2);
+bool isCorrectRoots(Test_data_equation test, N_roots count_roots, double x1, double x2);
 
 int main()
 {
-    if (test_solve_equation() == 0)
+    if (testSolveEquation() == 0)
         printf("Тестирование функции solve_equation прошло успешно\n");
 
     double a = 0, b = 0, c = 0;
@@ -44,64 +30,13 @@ int main()
     scanf("%lg %lg %lg", &a, &b, &c);
 
     double x1 = NAN, x2 = NAN;
-    N_roots count_roots = solve_equation(a, b, c, &x1, &x2);
+    N_roots count_roots = solveEquation(a, b, c, &x1, &x2);
 
-    print_roots(count_roots, x1, x2);
+    printRoots(count_roots, x1, x2);
     return 0;
 }
 
-N_roots solve_equation(double a, double b, double c,
-                       double* x1, double* x2)
-{
-    if (equal(a, 0))
-    {
-        return solve_linear(b, c, x1);
-    }
-    else
-    {
-        return solve_square(a, b, c, x1, x2);
-    }
-}
-
-N_roots solve_square(double a, double b, double c,
-                     double* x1, double* x2)
-{
-    double discriminant = b*b - 4*a*c;
-    if (discriminant > EPSILON)
-    {
-        *x1 = (-b + sqrt(discriminant)) / (2 * a);
-        *x2 = (-b - sqrt(discriminant)) / (2 * a);
-        return TWO_ROOTS;
-    }
-    else if (equal(discriminant, 0))
-    {
-        *x1 = *x2 = -b / (2 * a);
-        return ONE_ROOT;
-    }
-    else
-    {
-        return NO_ROOTS;
-    }
-}
-
-N_roots solve_linear(double b, double c,
-                     double* x)
-{
-    if (equal(b, 0))
-    {
-        if (equal(c, 0))
-            return INF_ROOT;
-        else
-            return NO_ROOTS;
-    }
-    else
-    {
-        *x = -c / b;
-        return ONE_ROOT;
-    }
-}
-
-void print_roots(N_roots count_roots,
+void printRoots(N_roots count_roots,
                  double x1, double x2)
 {
     switch (count_roots)
@@ -119,22 +54,15 @@ void print_roots(N_roots count_roots,
         case INF_ROOT:
             printf("Любое число");
             break;
+        case NAN_ROOTS:
         default:
             printf("count_roots = %d", count_roots);
             break;
     }
 }
 
-bool equal(double a, double b)
-{
-    if (isnan(a) && isnan(b))
-        return 1;
-    if (isnan(a) || isnan(b))
-        return 0;
-    return fabs(a - b) <= EPSILON;
-}
 
-int test_solve_equation()
+int testSolveEquation()
 {
     int count_failed_tests = 0;
     FILE *file = fopen("tests.txt", "r");
@@ -145,32 +73,34 @@ int test_solve_equation()
         double a = NAN, b = NAN, c = NAN;
         N_roots count_roots = NAN_ROOTS;
         double x1 = NAN, x2 = NAN;
-        fscanf(file, "%lg %lg %lg %d %lg %lg", &a, &b, &c, &count_roots, &x1, &x2);
-        Test test = {a, b, c, count_roots, x1, x2};
-        count_failed_tests += one_test(test);
+        int temp = 0;
+        fscanf(file, "%lg %lg %lg %d %lg %lg", &a, &b, &c, &temp, &x1, &x2);
+        count_roots = (N_roots)temp;
+        Test_data_equation test = {a, b, c, count_roots, x1, x2};
+        count_failed_tests += oneTestSolveEquation(test);
     }
     fclose(file);
     return count_failed_tests;
 }
 
-int one_test(Test current_test)
+bool oneTestSolveEquation(Test_data_equation current_test)
 {
     double x1 = NAN, x2 = NAN;
-    N_roots count_roots = solve_equation(current_test.a, current_test.b, current_test.c, &x1, &x2);
-    sort_roots(&x1, &x2);
-    sort_roots(&current_test.x1, &current_test.x2);
-    if (!is_correct_roots(current_test, count_roots, x1, x2))
+    N_roots count_roots = solveEquation(current_test.a, current_test.b, current_test.c, &x1, &x2);
+    sortRoots(&x1, &x2);
+    sortRoots(&current_test.x1, &current_test.x2);
+    if (!isCorrectRoots(current_test, count_roots, x1, x2))
     {
         printf("FAILED: a = %lg, b = %lg, c = %lg, count_roots = %d, x1 = %lg, x2 = %lg "
                "(should be count_roots = %d, x1 = %lg, x2 = %lg)\n",
                 current_test.a, current_test.b, current_test.c, count_roots, x1, x2,
                 current_test.count_roots, current_test.x1, current_test.x2);
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
-void sort_roots(double* x1, double* x2) // x1 = min(x1, x2), x2 = max(x1, x2), NAN > any num
+void sortRoots(double* x1, double* x2) // x1 = min(x1, x2), x2 = max(x1, x2), NAN > any num
 {
     if (isnan(*x1) && !isnan(*x2))
     {
@@ -185,17 +115,13 @@ void sort_roots(double* x1, double* x2) // x1 = min(x1, x2), x2 = max(x1, x2), N
     }
 }
 
-bool is_correct_roots(Test test, N_roots count_roots, double x1, double x2)
+bool isCorrectRoots(Test_data_equation test, N_roots count_roots, double x1, double x2)
 {
     if (test.count_roots != count_roots)
         return 0;
-    switch (count_roots)
-    {
-        case ONE_ROOT:
-            return equal(x1, test.x1);
-        case TWO_ROOTS:
-            return equal(x1, test.x1) && equal(x2, test.x2);
-        default:
-            return 1;
-    }
+    if (count_roots == ONE_ROOT)
+        return equal(x1, test.x1) || equal(x2, test.x2);
+    if (count_roots == TWO_ROOTS)
+        return equal(x1, test.x1) && equal(x2, test.x2);
+    return 1;
 }
