@@ -7,11 +7,19 @@ enum N_roots
     TWO_ROOTS = 2
 };
 
-N_roots solveEquation(double a, double b, double c,
-                       double* x1, double* x2);
-N_roots solveLinear(double b, double c,
-                     double* x);
-N_roots solveSquare(double a, double b, double c,
-                     double* x1, double* x2);
-bool equal(double a, double b);
+struct Coefficient_equation
+{
+    double a, b, c;
+};
+
+struct Roots_data
+{
+    N_roots count_roots;
+    double x1, x2;
+};
+
+Roots_data solveEquation(Coefficient_equation coeff);
+Roots_data solveLinear(double b, double c);
+Roots_data solveSquare(Coefficient_equation coeff);
+bool equalTwoDouble(double a, double b);
 

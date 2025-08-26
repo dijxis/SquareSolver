@@ -4,58 +4,59 @@
 const double EPSILON = 1e-9;
 
 
-N_roots solveEquation(double a, double b, double c,
-                       double* x1, double* x2)
+Roots_data solveEquation(Coefficient_equation coeff)
 {
-    if (equal(a, 0))
+    if (equalTwoDouble(coeff.a, 0))
     {
-        return solveLinear(b, c, x1);
+        return solveLinear(coeff.b, coeff.c);
     }
     else
     {
-        return solveSquare(a, b, c, x1, x2);
+        return solveSquare(coeff);
     }
 }
 
-N_roots solveSquare(double a, double b, double c,
-                     double* x1, double* x2)
+Roots_data solveSquare(Coefficient_equation coeff)
 {
-    double discriminant = b*b - 4*a*c;
+    Roots_data roots = {NAN_ROOTS, NAN, NAN};
+    double discriminant = coeff.b * coeff.b - 4 * coeff.a * coeff.c;
     if (discriminant > EPSILON)
     {
-        *x1 = (-b + sqrt(discriminant)) / (2 * a);
-        *x2 = (-b - sqrt(discriminant)) / (2 * a);
-        return TWO_ROOTS;
+        roots.x1 = (-coeff.b + sqrt(discriminant)) / (2 * coeff.a);
+        roots.x2 = (-coeff.b - sqrt(discriminant)) / (2 * coeff.a);
+        roots.count_roots = TWO_ROOTS;
     }
-    else if (equal(discriminant, 0))
+    else if (equalTwoDouble(discriminant, 0))
     {
-        *x1 = *x2 = -b / (2 * a);
-        return ONE_ROOT;
+        roots.x1 = roots.x2 = -coeff.b / (2 * coeff.a);
+        roots.count_roots = ONE_ROOT;
     }
     else
     {
-        return NO_ROOTS;
+        roots.count_roots = NO_ROOTS;
     }
+    return roots;
 }
 
-N_roots solveLinear(double b, double c,
-                     double* x)
+Roots_data solveLinear(double b, double c)
 {
-    if (equal(b, 0))
+    Roots_data roots = {NAN_ROOTS, NAN, NAN};
+    if (equalTwoDouble(b, 0))
     {
-        if (equal(c, 0))
-            return INF_ROOT;
+        if (equalTwoDouble(c, 0))
+            roots.count_roots = INF_ROOT;
         else
-            return NO_ROOTS;
+            roots.count_roots = NO_ROOTS;
     }
     else
     {
-        *x = -c / b;
-        return ONE_ROOT;
+        roots.x1 = -c / b;
+        roots.count_roots = ONE_ROOT;
     }
+    return roots;
 }
 
-bool equal(double a, double b)
+bool equalTwoDouble(double a, double b)
 {
     if (isnan(a) && isnan(b))
         return 1;
