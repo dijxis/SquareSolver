@@ -1,3 +1,6 @@
+#ifndef SOLVER_H_INCLUDED
+#define SOLVER_H_INCLUDED
+
 enum N_roots
 {
     NAN_ROOTS = -2,
@@ -23,3 +26,4 @@ Roots_data solveLinear(double b, double c);
 Roots_data solveSquare(Coefficient_equation coeff);
 bool equalTwoDouble(double a, double b);
 
+#endif

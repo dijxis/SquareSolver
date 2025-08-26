@@ -2,4 +2,5 @@ set FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align -Wundef -Wfloat-
 
 g++ -c .\main.c %FLAGS% -o main.o
 g++ -c .\solver.c %FLAGS% -o solver.o
-g++ txlib.o main.o solver.o %FLAGS% -o squaresolver.exe
+g++ -c .\test_solver.c %FLAGS% -o test_solver.o
+g++ txlib.o main.o solver.o test_solver.o %FLAGS% -o squaresolver.exe
