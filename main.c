@@ -3,6 +3,8 @@
 #include "solver.h"
 #include "test_solver.h"
 
+void readCoeff(Coefficient_equation* coeff);
+void readOneCoeff(double* one_coeff, char name_coeff);
 void printRoots(Roots_data roots);
 
 int main()
@@ -11,9 +13,7 @@ int main()
         printf("Testing func solveEquation success\n");
 
     Coefficient_equation coeff = {NAN, NAN, NAN};
-    printf("Enter coefficients of equation ax^2 + bx + c = 0\n"
-           "a b c: ");
-    scanf("%lg %lg %lg", &coeff.a, &coeff.b, &coeff.c);
+    readCoeff(&coeff);
 
     Roots_data roots = solveEquation(coeff);
 
@@ -43,5 +43,29 @@ void printRoots(Roots_data roots)
         default:
             printf("count_roots = %d", roots.count_roots);
             break;
+    }
+}
+
+
+void readCoeff(Coefficient_equation* coeff)
+{
+    printf("Enter coefficients of equation ax^2 + bx + c = 0\n");
+    readOneCoeff(&(coeff->a), 'a');
+    readOneCoeff(&(coeff->b), 'b');
+    readOneCoeff(&(coeff->c), 'c');
+}
+
+void readOneCoeff(double* one_coeff, char name_coeff)
+{
+    printf("Enter %c = ", name_coeff);
+    while (1)
+    {
+        bool number_is_read = scanf("%lg", one_coeff);
+        char ch = getchar();
+        if (number_is_read == 1 && ch == '\n')
+            break;
+        while (ch != '\n')
+            ch = getchar();
+        printf("Invalid input, enter again %c = ", name_coeff);
     }
 }
