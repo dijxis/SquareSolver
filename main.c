@@ -1,6 +1,5 @@
-#define TX_COMPILED
-#include <TXlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "solver.h"
 #include "test_solver.h"
 
@@ -9,11 +8,11 @@ void printRoots(Roots_data roots);
 int main()
 {
     if (testSolveEquation() == 0)
-        printf("Тестирование функции solve_equation прошло успешно\n");
+        printf("Testing func solveEquation success\n");
 
-    Coefficient_equation coeff = {0, 0, 0};
-    printf("Введите коэффициенты уравнения ax^2 + bx + c = 0\n"
-           "a, b, c: ");
+    Coefficient_equation coeff = {NAN, NAN, NAN};
+    printf("Enter coefficients of equation ax^2 + bx + c = 0\n"
+           "a b c: ");
     scanf("%lg %lg %lg", &coeff.a, &coeff.b, &coeff.c);
 
     Roots_data roots = solveEquation(coeff);
@@ -35,10 +34,10 @@ void printRoots(Roots_data roots)
             printf("x2 = %lg", roots.x2);
             break;
         case NO_ROOTS:
-            printf("Нет корней");
+            printf("No roots");
             break;
         case INF_ROOT:
-            printf("Любое число");
+            printf("Any numbers");
             break;
         case NAN_ROOTS:
         default:
