@@ -9,8 +9,10 @@ void printRoots(Roots_data roots);
 
 int main()
 {
-    if (testSolveEquation() == 0)
+    printf("Test solver? [y/n] ");
+    if (getchar() == 'y' && testSolveEquation() == 0)
         printf("Testing func solveEquation success\n");
+    while (getchar() != '\n');
 
     Coefficient_equation coeff = {NAN, NAN, NAN};
     readCoeff(&coeff);
@@ -18,7 +20,7 @@ int main()
     Roots_data roots = solveEquation(coeff);
 
     printRoots(roots);
-    printf("\nCOMMIT GITHUB");
+    printf("\nCOMMIT GITHUB\n");
     return 0;
 }
 
@@ -61,7 +63,8 @@ void readOneCoeff(double* one_coeff, char name_coeff)
     while (1)
     {
         bool number_is_read = scanf("%lg", one_coeff);
-        char ch = getchar();
+        int ch = 0;;
+        while ((ch = getchar()) == ' ');
         if (number_is_read == 1 && ch == '\n')
             break;
         while (ch != '\n')
